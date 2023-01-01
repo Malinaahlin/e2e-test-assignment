@@ -60,3 +60,26 @@ describe("Testing movie page", () => {
 
 });
 
+describe("Testing mock", () => {
+  it("Should not show mocked api movies", () => {
+    cy.intercept("GET", "http://omdbapi.com/*", {fakeSearch: [] }).as("moviecall");
+
+    cy.get("input").type("H").should("have.value", "H");
+    cy.get("button").click();
+    cy.wait("@moviecall").its("request.url").should("contain", "H");
+
+    cy.get("div").contains("Inga sökresultat att visa");
+  });
+
+  it("Should show mocked api movies", () => {
+    cy.intercept("GET", "http://omdbapi.com/*", {fixture: "movies"}).as("moviecall");
+
+    cy.get("input").type("Harry Potter").should("have.value", "Harry Potter");
+    cy.get("button").click();
+    cy.wait("@moviecall").its("request.url").should("contain", "Harry");
+
+    cy.get("h3").contains("Harry Potter");
+    cy.get("img");
+  });
+});
+
